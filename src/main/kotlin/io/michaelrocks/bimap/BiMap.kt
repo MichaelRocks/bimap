@@ -31,8 +31,8 @@ interface MutableBiMap<K : Any, V : Any> : BiMap<K, V>, MutableMap<K, V> {
 }
 
 abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
-    internal val direct: MutableMap<K, V>,
-    internal val reverse: MutableMap<V, K>
+    private val direct: MutableMap<K, V>,
+    private val reverse: MutableMap<V, K>
 ) : MutableBiMap<K, V> {
   override val size: Int
     get() = direct.size
