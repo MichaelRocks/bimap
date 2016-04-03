@@ -30,7 +30,7 @@ interface MutableBiMap<K : Any, V : Any> : BiMap<K, V>, MutableMap<K, V> {
   fun forcePut(key: K, value: V): V?
 }
 
-abstract class AbstractBiMap<K : Any, V : Any> internal constructor(
+abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
     internal val direct: MutableMap<K, V>,
     internal val reverse: MutableMap<V, K>
 ) : MutableBiMap<K, V> {
