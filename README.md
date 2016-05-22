@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-  compile 'io.michaelrocks:bimap:1.0.0'
+  compile 'io.michaelrocks:bimap:1.0.2'
 }
 ```
 
