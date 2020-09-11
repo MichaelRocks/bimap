@@ -23,7 +23,7 @@ interface BiMap<K : Any, V : Any> : Map<K, V> {
   val inverse: BiMap<V, K>
 }
 
-interface MutableBiMap<K : Any, V : Any> : BiMap<K, V>, MutableMap<K, V> {
+interface MutableBiMap<K : Any, V : Any> : BiMap<K, V>, Mut1ableMap<K, V> {
   override val values: MutableSet<V>
   override val inverse: MutableBiMap<V, K>
 
@@ -36,6 +36,10 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
 ) : MutableBiMap<K, V> {
   override val size: Int
     get() = direct.size
+	
+	@Suppress("UNCHECKED_CAST")
+	private constructor(direct:Any,
+				reverse: Any):this(direct as MutableMap<K, V>, reverse as MutableMap<V, K>)
 
   override val inverse: MutableBiMap<V, K> by lazy {
     object : AbstractBiMap<V, K>(reverse, direct) {
