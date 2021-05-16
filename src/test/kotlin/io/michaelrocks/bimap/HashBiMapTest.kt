@@ -17,21 +17,19 @@
 
 package io.michaelrocks.bimap
 
-import org.junit.Assert.*
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class HashBiMapTest {
-  companion object {
-    private val N = 1000
-  }
-
   @Test
   fun testMapConstructor() {
     /* Test with non-empty Map. */
     val map = mapOf(
-        "canada" to "dollar",
-        "chile" to "peso",
-        "switzerland" to "franc"
+      "canada" to "dollar",
+      "chile" to "peso",
+      "switzerland" to "franc"
     )
     val bimap = HashBiMap.create(map)
     assertEquals("dollar", bimap["canada"])
@@ -43,30 +41,30 @@ class HashBiMapTest {
     val bimap = HashBiMap<Int, Int>(N)
     val inverse = bimap.inverse
 
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertNull(bimap.put(2 * i, 2 * i + 1))
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertEquals((2 * i + 1).toLong(), (bimap[2 * i] as Int).toLong())
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertEquals((2 * i).toLong(), (inverse[2 * i + 1] as Int).toLong())
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       val oldValue = bimap[2 * i]!!
       assertEquals((2 * i + 1).toLong(), (bimap.put(2 * i, oldValue - 2) as Int).toLong())
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertEquals((2 * i - 1).toLong(), (bimap[2 * i] as Int).toLong())
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertEquals((2 * i).toLong(), (inverse[2 * i - 1] as Int).toLong())
     }
     val entries = bimap.entries
     for (entry in entries) {
       entry.setValue(entry.value + 2 * N)
     }
-    for (i in 0..N - 1) {
+    repeat(N) { i ->
       assertEquals((2 * N + 2 * i - 1).toLong(), (bimap[2 * i] as Int).toLong())
     }
   }
@@ -74,7 +72,7 @@ class HashBiMapTest {
   @Test
   fun testBiMapEntrySetIteratorRemove() {
     val map = HashBiMap<Int, String>()
-    map.put(1, "one")
+    map[1] = "one"
     val entries = map.entries
     val iterator = entries.iterator()
     val entry = iterator.next()
@@ -88,18 +86,18 @@ class HashBiMapTest {
   @Test
   fun testInsertionOrder() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
     assertContainsExactly(map.entries, "foo" to 1, "bar" to 2, "quux" to 3)
   }
 
   @Test
   fun testInsertionOrderAfterRemoveFirst() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.remove("foo")
     assertContainsExactly(map.entries, "bar" to 2, "quux" to 3)
@@ -108,9 +106,9 @@ class HashBiMapTest {
   @Test
   fun testInsertionOrderAfterRemoveMiddle() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.remove("bar")
     assertContainsExactly(map.entries, "foo" to 1, "quux" to 3)
@@ -119,9 +117,9 @@ class HashBiMapTest {
   @Test
   fun testInsertionOrderAfterRemoveLast() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.remove("quux")
     assertContainsExactly(map.entries, "foo" to 1, "bar" to 2)
@@ -130,9 +128,9 @@ class HashBiMapTest {
   @Test
   fun testInsertionOrderAfterForcePut() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.forcePut("quux", 1)
     assertContainsExactly(map.entries, "bar" to 2, "quux" to 1)
@@ -141,9 +139,9 @@ class HashBiMapTest {
   @Test
   fun testInsertionOrderAfterInverseForcePut() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.inverse.forcePut(1, "quux")
     assertContainsExactly(map.entries, "bar" to 2, "quux" to 1)
@@ -152,9 +150,9 @@ class HashBiMapTest {
   @Test
   fun testInverseInsertionOrderAfterInverseForcePut() {
     val map = HashBiMap<String, Int>()
-    map.put("foo", 1)
-    map.put("bar", 2)
-    map.put("quux", 3)
+    map["foo"] = 1
+    map["bar"] = 2
+    map["quux"] = 3
 
     map.inverse.forcePut(1, "quux")
     assertContainsExactly(map.inverse.entries, 2 to "bar", 1 to "quux")
@@ -163,7 +161,7 @@ class HashBiMapTest {
   @Test
   fun testInverseEntrySetValue() {
     val map = HashBiMap<Int, String>()
-    map.put(1, "one")
+    map[1] = "one"
     val inverseEntry = map.inverse.entries.first()
     inverseEntry.setValue(2)
     assertEquals(Integer.valueOf(2), inverseEntry.value)
@@ -175,5 +173,9 @@ class HashBiMapTest {
     for ((key, value) in collection) {
       assertEquals(value, map[key])
     }
+  }
+
+  companion object {
+    private const val N = 1000
   }
 }

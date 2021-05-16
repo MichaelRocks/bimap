@@ -16,8 +16,6 @@
 
 package io.michaelrocks.bimap
 
-import java.util.*
-
 interface BiMap<K : Any, V : Any> : Map<K, V> {
   override val values: Set<V>
   val inverse: BiMap<V, K>
@@ -31,8 +29,8 @@ interface MutableBiMap<K : Any, V : Any> : BiMap<K, V>, MutableMap<K, V> {
 }
 
 abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
-    private val direct: MutableMap<K, V>,
-    private val reverse: MutableMap<V, K>
+  private val direct: MutableMap<K, V>,
+  private val reverse: MutableMap<V, K>
 ) : MutableBiMap<K, V> {
   override val size: Int
     get() = direct.size
@@ -44,10 +42,12 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
     }
   }
 
-  override val entries: MutableSet<MutableMap.MutableEntry<K, V>> =
-      BiMapSet(direct.entries, { it.key }, { BiMapEntry(it) })
-  override val keys: MutableSet<K>
-    get() = BiMapSet(direct.keys, { it }, { it })
+  override val entries: MutableSet<MutableMap.MutableEntry<K, V>> by lazy {
+    BiMapSet(direct.entries, { it.key }, { BiMapEntry(it) })
+  }
+  override val keys: MutableSet<K> by lazy {
+    BiMapSet(direct.keys, { it }, { it })
+  }
   override val values: MutableSet<V>
     get() = inverse.keys
 
@@ -101,9 +101,9 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
   }
 
   private inner class BiMapSet<T : Any>(
-      private val elements: MutableSet<T>,
-      private val keyGetter: (T) -> K,
-      private val elementWrapper: (T) -> T
+    private val elements: MutableSet<T>,
+    private val keyGetter: (T) -> K,
+    private val elementWrapper: (T) -> T
   ) : MutableSet<T> by elements {
     override fun remove(element: T): Boolean {
       if (element !in this) {
@@ -115,7 +115,7 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
       try {
         reverse.remove(value)
       } catch (throwable: Throwable) {
-        direct.put(key, value)
+        direct[key] = value
         throw throwable
       }
       return true
@@ -133,9 +133,9 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
   }
 
   private inner class BiMapSetIterator<T : Any>(
-      private val iterator: MutableIterator<T>,
-      private val keyGetter: (T) -> K,
-      private val elementWrapper: (T) -> T
+    private val iterator: MutableIterator<T>,
+    private val keyGetter: (T) -> K,
+    private val elementWrapper: (T) -> T
   ) : MutableIterator<T> {
     private var last: T? = null
 
@@ -159,7 +159,7 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
         try {
           iterator.remove()
         } catch (throwable: Throwable) {
-          reverse.put(value, key)
+          reverse[value] = key
           throw throwable
         }
       } finally {
@@ -169,20 +169,20 @@ abstract class AbstractBiMap<K : Any, V : Any> protected constructor(
   }
 
   private inner class BiMapEntry(
-      private val entry: MutableMap.MutableEntry<K, V>
+    private val entry: MutableMap.MutableEntry<K, V>
   ) : MutableMap.MutableEntry<K, V> by entry {
     override fun setValue(newValue: V): V {
       if (entry.value == newValue) {
-        reverse.put(newValue, entry.key)
+        reverse[newValue] = entry.key
         try {
           return entry.setValue(newValue)
         } catch (throwable: Throwable) {
-          reverse.put(entry.value, entry.key)
+          reverse[entry.value] = entry.key
           throw throwable
         }
       } else {
         check(newValue !in reverse) { "BiMap already contains value $newValue" }
-        reverse.put(newValue, entry.key)
+        reverse[newValue] = entry.key
         try {
           return entry.setValue(newValue)
         } catch (throwable: Throwable) {

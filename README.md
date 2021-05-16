@@ -8,11 +8,11 @@ Download
 Gradle:
 ```groovy
 repositories {
-  jcenter()
+  mavenCentral()
 }
 
 dependencies {
-  implementation 'io.michaelrocks:bimap:1.1.0'
+  implementation 'io.michaelrocks.bimap:bimap:1.1.0'
 }
 ```
 

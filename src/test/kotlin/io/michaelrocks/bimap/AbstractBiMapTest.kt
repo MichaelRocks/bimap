@@ -17,17 +17,17 @@
 
 package io.michaelrocks.bimap
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import java.util.*
+import java.util.IdentityHashMap
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class AbstractBiMapTest {
   @Test
   fun testIdentityKeySetIteratorRemove() {
     val bimap = object : AbstractBiMap<Int, String>(IdentityHashMap(), IdentityHashMap()) {}
-    bimap.put(1, "one")
-    bimap.put(2, "two")
-    bimap.put(3, "three")
+    bimap[1] = "one"
+    bimap[2] = "two"
+    bimap[3] = "three"
     val iterator = bimap.keys.iterator()
     iterator.next()
     iterator.next()
@@ -41,9 +41,9 @@ class AbstractBiMapTest {
   @Test
   fun testIdentityEntrySetIteratorRemove() {
     val bimap = object : AbstractBiMap<Int, String>(IdentityHashMap(), IdentityHashMap()) {}
-    bimap.put(1, "one")
-    bimap.put(2, "two")
-    bimap.put(3, "three")
+    bimap[1] = "one"
+    bimap[2] = "two"
+    bimap[3] = "three"
     val iterator = bimap.entries.iterator()
     iterator.next()
     iterator.next()
